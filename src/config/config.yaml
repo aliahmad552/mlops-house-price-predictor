@@ -1,0 +1,14 @@
+# Add your configuration here (paths, DB creds via env vars, features)
+# Example:
+# data_source:
+#   mysql:
+#     host: ${MYSQL_HOST}
+#     port: ${MYSQL_PORT}
+#     user: ${MYSQL_USER}
+#     password: ${MYSQL_PASSWORD}
+#     database: ${MYSQL_DATABASE}
+
+data:
+  mysql_table: house_prices
+  raw_path: data/raw/house_prices.csv
+
