@@ -1,0 +1,17 @@
+data_ingestion:
+  raw_data_path: artifacts/raw_data/data.csv
+
+# data_validation:
+#   valid_data_path: artifacts/validated_data/data.csv
+
+# data_transformation:
+#   transformed_train: artifacts/transformed_data/train.npy
+#   transformed_test: artifacts/transformed_data/test.npy
+#   preprocessor_path: artifacts/transformed_data/preprocessor.pkl
+
+# model_trainer:
+#   model_path: artifacts/models/model.pkl
+#   test_size: 0.2
+
+# model_evaluation:
+#   report_path: artifacts/reports/metrics.json

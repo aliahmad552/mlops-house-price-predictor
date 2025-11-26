@@ -1,0 +1,44 @@
+stages:
+  data_ingestion:
+    cmd: python -m src.data.data_ingestion
+    deps:
+      - src/data/data_ingestion.py
+      - config/config.yaml
+    outs:
+      - artifacts/raw_data/data.csv
+
+  # data_validation:
+  #   cmd: python -m src.data.data_validation
+  #   deps:
+  #     - src/data/data_validation.py
+  #     - artifacts/raw_data/data.csv
+  #   outs:
+  #     - artifacts/validated_data/data.csv
+
+  # data_transformation:
+  #   cmd: python -m src.data.data_transformation
+  #   deps:
+  #     - src/data/data_transformation.py
+  #     - artifacts/validated_data/data.csv
+  #   outs:
+  #     - artifacts/transformed_data/train.npy
+  #     - artifacts/transformed_data/test.npy
+  #     - artifacts/transformed_data/preprocessor.pkl
+
+  # model_trainer:
+  #   cmd: python -m src.model.model_trainer
+  #   deps:
+  #     - src/model/model_trainer.py
+  #     - artifacts/transformed_data/train.npy
+  #     - artifacts/transformed_data/test.npy
+  #   outs:
+  #     - artifacts/models/model.pkl
+
+  # model_evaluation:
+  #   cmd: python -m src.model.model_evaluation
+  #   deps:
+  #     - src/model/model_evaluation.py
+  #     - artifacts/models/model.pkl
+  #     - artifacts/transformed_data/test.npy
+  #   outs:
+  #     - artifacts/reports/metrics.json
