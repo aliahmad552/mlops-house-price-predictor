@@ -12,7 +12,7 @@ from src.utils.file_ops import read_sql_data
 # Read YAML configuration
 def read_config():
     try:
-        config_path = os.path.join(os.getcwd(),"src", "config", "config.yaml")
+        config_path = os.path.join(os.getcwd(), "src", "config", "config.yaml")
         with open(config_path, "r") as f:
             return yaml.safe_load(f)
     except Exception as e:
@@ -23,6 +23,8 @@ def read_config():
 class DataIngestionConfig:
     mysql_table: str
     raw_path: str
+    sale_path: str
+    rent_path: str
 
 
 class DataIngestion:
@@ -31,17 +33,21 @@ class DataIngestion:
 
         self.config = DataIngestionConfig(
             mysql_table=cfg["data"]["mysql_table"],
-            raw_path=cfg["data"]["raw_path"]
+            raw_path=cfg["data"]["raw_path"],
+            sale_path=cfg["data"].get("sale_path", "artifacts/raw_data/sale.csv"),
+            rent_path=cfg["data"].get("rent_path", "artifacts/raw_data/rent.csv"),
         )
 
         logger.info(f"DataIngestion initialized: table={self.config.mysql_table}, "
-                    f"raw_path={self.config.raw_path}")
+                    f"raw_path={self.config.raw_path}, "
+                    f"sale_path={self.config.sale_path}, "
+                    f"rent_path={self.config.rent_path}")
 
     def fetch_data(self) -> pd.DataFrame:
         try:
             logger.info(f"Reading data from MySQL table: {self.config.mysql_table}")
 
-            df = read_sql_data("house_prices")  # Your custom MySQL function
+            df = read_sql_data(self.config.mysql_table)
             logger.info(f"MySQL data fetched successfully. Shape: {df.shape}")
 
             if df.empty:
@@ -54,11 +60,26 @@ class DataIngestion:
 
     def save_raw_data(self, df: pd.DataFrame):
         try:
+            # Save full dataset
             os.makedirs(os.path.dirname(self.config.raw_path), exist_ok=True)
             df.to_csv(self.config.raw_path, index=False)
             logger.info(f"Raw dataset saved at: {self.config.raw_path}")
+
+            # Split Sale and Rent
+            df["purpose"] = df["purpose"].str.strip().str.lower()
+            df_sale = df[df["purpose"] == "for sale"]
+            df_rent = df[df["purpose"] == "for rent"]
+
+            os.makedirs(os.path.dirname(self.config.sale_path), exist_ok=True)
+            df_sale.to_csv(self.config.sale_path, index=False)
+            logger.info(f"Sale dataset saved at: {self.config.sale_path}")
+
+            os.makedirs(os.path.dirname(self.config.rent_path), exist_ok=True)
+            df_rent.to_csv(self.config.rent_path, index=False)
+            logger.info(f"Rent dataset saved at: {self.config.rent_path}")
+
         except Exception as e:
-            raise CustomException(f"Failed to save raw CSV: {e}", sys)
+            raise CustomException(f"Failed to save raw CSVs: {e}", sys)
 
     def run(self):
         try:
@@ -68,7 +89,7 @@ class DataIngestion:
             self.save_raw_data(df)
 
             logger.info("===== DATA INGESTION COMPLETED SUCCESSFULLY =====")
-            return self.config.raw_path
+            return self.config.raw_path, self.config.sale_path, self.config.rent_path
 
         except Exception as e:
             raise CustomException(f"Data Ingestion Failed: {e}", sys)

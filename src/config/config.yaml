@@ -14,3 +14,6 @@ data:
   sale_path: artifacts/raw_data/sale.csv
   rent_path: artifacts/raw_data/rent.csv
 
+transformed:
+  sale_dir: artifacts/transformed_data/sale/
+  rent_dir: artifacts/transformed_data/rent/

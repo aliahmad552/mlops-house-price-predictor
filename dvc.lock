@@ -5,17 +5,37 @@ stages:
     deps:
     - path: src/config/config.yaml
       hash: md5
-      md5: 09dc23e5554ebb5195969ab4e81ac3d4
-      size: 342
+      md5: bd7ec8788c1ef60601424c9e938fce3c
+      size: 532
     - path: src/data/data_ingestion.py
       hash: md5
-      md5: 54c8bbb26ba0c95fe8d80df539341ba3
-      size: 2415
+      md5: 259a2fc9baacbed847b8c807e3d54038
+      size: 3464
+    - path: src/utils/exceptions.py
+      hash: md5
+      md5: a1604a11cb224fcdd0e3e0b58e8a141c
+      size: 729
+    - path: src/utils/file_ops.py
+      hash: md5
+      md5: e2e670731ea6fd5f05a51ddec1499488
+      size: 2739
+    - path: src/utils/logger.py
+      hash: md5
+      md5: f4ec9abd93dbafe42e98b1a3cfb2174d
+      size: 496
     outs:
-    - path: data/raw/house_prices.csv
+    - path: artifacts/raw_data/data.csv
       hash: md5
       md5: 90b34c4cf312000a340d41e1f7de2fd4
       size: 3827951
+    - path: artifacts/raw_data/rent.csv
+      hash: md5
+      md5: c5051d9547166b4e2b6e22a8ef1eb77d
+      size: 1013622
+    - path: artifacts/raw_data/sale.csv
+      hash: md5
+      md5: 4df97b2f62f1e5caf5138b3854ac020d
+      size: 2814417
   data_transformation:
     cmd: python -m src.data.data_transformation
     deps:
@@ -76,3 +96,91 @@ stages:
       hash: md5
       md5: 242b6ac4ee312f9f1cf6c99affb5e4e7
       size: 12799939
+  data_transformation_sale:
+    cmd: python -m src.data.data_transformation_sale
+    deps:
+    - path: artifacts/raw_data/sale.csv
+      hash: md5
+      md5: 4df97b2f62f1e5caf5138b3854ac020d
+      size: 2814417
+    - path: src/data/data_transformation_sale.py
+      hash: md5
+      md5: 02f0687616cd3943b36d2640d91672f6
+      size: 4262
+    - path: src/utils/exceptions.py
+      hash: md5
+      md5: a1604a11cb224fcdd0e3e0b58e8a141c
+      size: 729
+    - path: src/utils/file_ops.py
+      hash: md5
+      md5: e2e670731ea6fd5f05a51ddec1499488
+      size: 2739
+    - path: src/utils/logger.py
+      hash: md5
+      md5: f4ec9abd93dbafe42e98b1a3cfb2174d
+      size: 496
+    outs:
+    - path: artifacts/transformed_data/sale/X_test.npy
+      hash: md5
+      md5: 0bd1175fe511aee8d297cec58e7cbde3
+      size: 99605536
+    - path: artifacts/transformed_data/sale/X_train.npy
+      hash: md5
+      md5: 53ede79d318535b9c66597b1678aaa90
+      size: 398411232
+    - path: artifacts/transformed_data/sale/preprocessor.pkl
+      hash: md5
+      md5: 36450250f5726d4ecce912a7fca943e6
+      size: 24749
+    - path: artifacts/transformed_data/sale/y_test.npy
+      hash: md5
+      md5: 1a8f6fb33fbd084334599a25778447b8
+      size: 75816
+    - path: artifacts/transformed_data/sale/y_train.npy
+      hash: md5
+      md5: 5943f7c5d459015aaabf2518ee2352bb
+      size: 302872
+  data_transformation_rent:
+    cmd: python -m src.data.data_transformation_rent
+    deps:
+    - path: artifacts/raw_data/rent.csv
+      hash: md5
+      md5: c5051d9547166b4e2b6e22a8ef1eb77d
+      size: 1013622
+    - path: src/data/data_transformation_rent.py
+      hash: md5
+      md5: 82924b065dfb1d0eb613253c8f6f22ab
+      size: 4262
+    - path: src/utils/exceptions.py
+      hash: md5
+      md5: a1604a11cb224fcdd0e3e0b58e8a141c
+      size: 729
+    - path: src/utils/file_ops.py
+      hash: md5
+      md5: e2e670731ea6fd5f05a51ddec1499488
+      size: 2739
+    - path: src/utils/logger.py
+      hash: md5
+      md5: f4ec9abd93dbafe42e98b1a3cfb2174d
+      size: 496
+    outs:
+    - path: artifacts/transformed_data/rent/X_test.npy
+      hash: md5
+      md5: 52553bdfda9b005f072ec6b2b10864f6
+      size: 14077032
+    - path: artifacts/transformed_data/rent/X_train.npy
+      hash: md5
+      md5: ae2b946f4e2d19893fef8353667ef45c
+      size: 56295528
+    - path: artifacts/transformed_data/rent/preprocessor.pkl
+      hash: md5
+      md5: 1ef2cf2c323b2a29b787fbd47ceafc77
+      size: 10703
+    - path: artifacts/transformed_data/rent/y_test.npy
+      hash: md5
+      md5: 62628e7546fb00ae8e77ac0c7f74b358
+      size: 27784
+    - path: artifacts/transformed_data/rent/y_train.npy
+      hash: md5
+      md5: 927287a1800870c08dff4201d65cdaa9
+      size: 110728
