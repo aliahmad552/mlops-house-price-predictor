@@ -10,5 +10,7 @@
 
 data:
   mysql_table: house_prices
-  raw_path: data/raw/house_prices.csv
+  raw_path: artifacts/raw_data/data.csv
+  sale_path: artifacts/raw_data/sale.csv
+  rent_path: artifacts/raw_data/rent.csv
 

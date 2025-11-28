@@ -3,42 +3,77 @@ stages:
     cmd: python -m src.data.data_ingestion
     deps:
       - src/data/data_ingestion.py
-      - config/config.yaml
+      - src/utils/file_ops.py
+      - src/utils/logger.py
+      - src/utils/exceptions.py
+      - src/config/config.yaml
     outs:
       - artifacts/raw_data/data.csv
+      - artifacts/raw_data/sale.csv
+      - artifacts/raw_data/rent.csv
 
-  # data_validation:
-  #   cmd: python -m src.data.data_validation
+  # data_transformation_sale:
+  #   cmd: python -m src.data.data_transformation_sale
   #   deps:
-  #     - src/data/data_validation.py
-  #     - artifacts/raw_data/data.csv
+  #     - src/data/data_transformation_sale.py
+  #     - src/utils/file_ops.py
+  #     - src/utils/logger.py
+  #     - src/utils/exceptions.py
+  #     - artifacts/raw_data/sale.csv
   #   outs:
-  #     - artifacts/validated_data/data.csv
+  #     - artifacts/transformed_data/sale/X_train.npy
+  #     - artifacts/transformed_data/sale/X_test.npy
+  #     - artifacts/transformed_data/sale/y_train.npy
+  #     - artifacts/transformed_data/sale/y_test.npy
+  #     - artifacts/transformed_data/sale/preprocessor.pkl
+  #   needs:
+  #     - data_ingestion
 
-  # data_transformation:
-  #   cmd: python -m src.data.data_transformation
+  # data_transformation_rent:
+  #   cmd: python -m src.data.data_transformation_rent
   #   deps:
-  #     - src/data/data_transformation.py
-  #     - artifacts/validated_data/data.csv
+  #     - src/data/data_transformation_rent.py
+  #     - src/utils/file_ops.py
+  #     - src/utils/logger.py
+  #     - src/utils/exceptions.py
+  #     - artifacts/raw_data/rent.csv
   #   outs:
-  #     - artifacts/transformed_data/train.npy
-  #     - artifacts/transformed_data/test.npy
-  #     - artifacts/transformed_data/preprocessor.pkl
+  #     - artifacts/transformed_data/rent/X_train.npy
+  #     - artifacts/transformed_data/rent/X_test.npy
+  #     - artifacts/transformed_data/rent/y_train.npy
+  #     - artifacts/transformed_data/rent/y_test.npy
+  #     - artifacts/transformed_data/rent/preprocessor.pkl
+  #   needs:
+  #     - data_ingestion
 
-  # model_trainer:
-  #   cmd: python -m src.model.model_trainer
+  # train_sale_model:
+  #   cmd: python -m src.model.train_sale_model
   #   deps:
-  #     - src/model/model_trainer.py
-  #     - artifacts/transformed_data/train.npy
-  #     - artifacts/transformed_data/test.npy
+  #     - src/model/train_sale_model.py
+  #     - src/utils/file_ops.py
+  #     - src/utils/logger.py
+  #     - src/utils/exceptions.py
+  #     - artifacts/transformed_data/sale/X_train.npy
+  #     - artifacts/transformed_data/sale/X_test.npy
+  #     - artifacts/transformed_data/sale/y_train.npy
+  #     - artifacts/transformed_data/sale/y_test.npy
   #   outs:
-  #     - artifacts/models/model.pkl
+  #     - artifacts/models/sale_model.pkl
+  #   needs:
+  #     - data_transformation_sale
 
-  # model_evaluation:
-  #   cmd: python -m src.model.model_evaluation
+  # train_rent_model:
+  #   cmd: python -m src.model.train_rent_model
   #   deps:
-  #     - src/model/model_evaluation.py
-  #     - artifacts/models/model.pkl
-  #     - artifacts/transformed_data/test.npy
+  #     - src/model/train_rent_model.py
+  #     - src/utils/file_ops.py
+  #     - src/utils/logger.py
+  #     - src/utils/exceptions.py
+  #     - artifacts/transformed_data/rent/X_train.npy
+  #     - artifacts/transformed_data/rent/X_test.npy
+  #     - artifacts/transformed_data/rent/y_train.npy
+  #     - artifacts/transformed_data/rent/y_test.npy
   #   outs:
-  #     - artifacts/reports/metrics.json
+  #     - artifacts/models/rent_model.pkl
+  #   needs:
+  #     - data_transformation_rent

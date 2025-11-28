@@ -1,13 +1,17 @@
 data_ingestion:
-  raw_data_path: artifacts/raw_data/data.csv
+  raw_data_path: data/raw/house_prices.csv
+
+
 
 # data_validation:
 #   valid_data_path: artifacts/validated_data/data.csv
 
-# data_transformation:
-#   transformed_train: artifacts/transformed_data/train.npy
-#   transformed_test: artifacts/transformed_data/test.npy
-#   preprocessor_path: artifacts/transformed_data/preprocessor.pkl
+data_transformation:
+  transformed_X_train: data/transformed_data/X_train.npy
+  transformed_X_test: data/transformed_data/X_test.npy
+  transformed_y_train: data/transformed_data/y_train.npy
+  transformed_y_test: data/transformed_data/y_test.npy
+  preprocessor_path: data/transformed_data/preprocessor.pkl
 
 # model_trainer:
 #   model_path: artifacts/models/model.pkl

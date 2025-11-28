@@ -16,3 +16,63 @@ stages:
       hash: md5
       md5: 90b34c4cf312000a340d41e1f7de2fd4
       size: 3827951
+  data_transformation:
+    cmd: python -m src.data.data_transformation
+    deps:
+    - path: data/raw/house_prices.csv
+      hash: md5
+      md5: 90b34c4cf312000a340d41e1f7de2fd4
+      size: 3827951
+    - path: src/data/data_transformation.py
+      hash: md5
+      md5: 2a31c33067876657f53e4bd48e58af77
+      size: 4119
+    outs:
+    - path: data/transformed_data/X_test.npy
+      hash: md5
+      md5: eeadd8473e980d3dfee8bd5de5f618df
+      size: 142201472
+    - path: data/transformed_data/X_train.npy
+      hash: md5
+      md5: 75415e38cda9019ee1656d7242dd71ff
+      size: 568761472
+    - path: data/transformed_data/preprocessor.pkl
+      hash: md5
+      md5: 72c720ce273fbaaac593f0673fbe469e
+      size: 25837
+    - path: data/transformed_data/y_test.npy
+      hash: md5
+      md5: 125ad80099f7d3c1dd2ab4a32d2f2ad3
+      size: 103472
+    - path: data/transformed_data/y_train.npy
+      hash: md5
+      md5: d0779df0635a30ca78e16471fd62a371
+      size: 413472
+  train_sale_model:
+    cmd: python -m src.models.train_sale_model
+    deps:
+    - path: data/transformed_data/X_test.npy
+      hash: md5
+      md5: eeadd8473e980d3dfee8bd5de5f618df
+      size: 142201472
+    - path: data/transformed_data/X_train.npy
+      hash: md5
+      md5: 75415e38cda9019ee1656d7242dd71ff
+      size: 568761472
+    - path: data/transformed_data/y_test.npy
+      hash: md5
+      md5: 125ad80099f7d3c1dd2ab4a32d2f2ad3
+      size: 103472
+    - path: data/transformed_data/y_train.npy
+      hash: md5
+      md5: d0779df0635a30ca78e16471fd62a371
+      size: 413472
+    - path: src/models/train_sale_model.py
+      hash: md5
+      md5: 77e8e87ff8fa5d43819e6480dd7e4ace
+      size: 1272
+    outs:
+    - path: data/models/sale_model.pkl
+      hash: md5
+      md5: 242b6ac4ee312f9f1cf6c99affb5e4e7
+      size: 12799939
