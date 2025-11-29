@@ -17,3 +17,17 @@ data:
 transformed:
   sale_dir: artifacts/transformed_data/sale/
   rent_dir: artifacts/transformed_data/rent/
+
+training:
+  sale:
+    transformed_dir: artifacts/transformed_data/sale
+    model_path: artifacts/models/xgb_sale.pkl
+    preprocessor_path: artifacts/transformed_data/sale/preprocessor.pkl
+    mlflow_experiment: house_price_sale
+
+  rent:
+    transformed_dir: artifacts/transformed_data/rent
+    model_path: artifacts/models/xgb_rent.pkl
+    preprocessor_path: artifacts/transformed_data/rent/preprocessor.pkl
+    mlflow_experiment: house_price_rent
+  

@@ -1,0 +1,4 @@
+[core]
+    remote = dagshub-storage
+['remote "dagshub-storage"']
+    url = https://dagshub.com/aliahmad552/mlops-house-price-predictor.dvc

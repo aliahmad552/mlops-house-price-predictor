@@ -1,4 +1,4 @@
 logs
 myenv
-data
 __pycache__
+mlruns/
