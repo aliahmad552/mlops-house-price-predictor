@@ -93,8 +93,8 @@ stages:
       size: 302872
     - path: src/models/train_sale_model.py
       hash: md5
-      md5: 59c8f01c015949c106dbd1f80448cc8b
-      size: 5039
+      md5: 0f3a1eef6f24fe0ebceb69a2429a76fe
+      size: 5257
     params:
       params.yaml:
         model.sale.colsample_bytree: 0.8
@@ -229,8 +229,8 @@ stages:
       size: 999
     - path: src/models/train_rent_model.py
       hash: md5
-      md5: eec01aa6e21aff665a914a2a98175c32
-      size: 3621
+      md5: 86f50a6aedfb2de003c3a419e0bb4594
+      size: 3878
     params:
       params.yaml:
         model.rent.colsample_bytree: 0.8
