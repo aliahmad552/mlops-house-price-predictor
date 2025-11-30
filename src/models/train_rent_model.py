@@ -11,7 +11,16 @@ from sklearn.metrics import mean_squared_error, r2_score
 from src.utils.logger import logger
 from src.utils.exceptions import CustomException
 from src.utils.file_ops import save_object
+from dotenv import load_dotenv
+import os
+import mlflow
 
+load_dotenv()
+
+mlflow.set_tracking_uri(os.getenv("MLFLOW_TRACKING_URI"))
+mlflow.set_experiment("House_Price_Predictor")
+os.environ["MLFLOW_TRACKING_USERNAME"] = os.getenv("MLFLOW_TRACKING_USERNAME")
+os.environ["MLFLOW_TRACKING_PASSWORD"] = os.getenv("MLFLOW_TRACKING_PASSWORD")
 
 class TrainRentConfig:
     def __init__(self):
@@ -71,6 +80,8 @@ class TrainRentModel:
 
     def run(self):
         X_train, X_test, y_train, y_test = self.load_data()
+        
+
 
         mlflow.set_experiment(self.config.mlflow_experiment)
         with mlflow.start_run():
@@ -79,6 +90,7 @@ class TrainRentModel:
 
             mlflow.log_metric("RMSE", rmse)
             mlflow.log_metric("R2", r2)
+
 
             mlflow.xgboost.log_model(model, "xgb_rent_model")
 

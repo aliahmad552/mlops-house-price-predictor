@@ -1,4 +1,8 @@
 [core]
     remote = dagshub-storage
+    autostage = true
 ['remote "dagshub-storage"']
     url = https://dagshub.com/aliahmad552/mlops-house-price-predictor.dvc
+    auth = basic
+    user = aliahmad552
+    password = 8b2df7b10de7720b058d7deafc275e1ef69e2e0a
