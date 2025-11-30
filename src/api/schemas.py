@@ -1,12 +1,10 @@
-# Auto-generated placeholder
-# Replace or extend this file with your project-specific logic.
 from pydantic import BaseModel
 
 class HouseFeatures(BaseModel):
-    Area_in_Marla: float
-    baths: int
-    bedrooms: int
-    city: str
     location: str
+    city: str
     property_type: str
-    purpose: str
+    purpose: str  # "sale" or "rent"
+    bedrooms: int
+    baths: int
+    Area_in_Marla: float

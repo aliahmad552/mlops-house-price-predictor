@@ -3,6 +3,7 @@ import sys
 import yaml
 import mlflow
 import mlflow.xgboost
+import mlflow.sklearn
 import numpy as np
 from xgboost import XGBRegressor
 from sklearn.ensemble import RandomForestRegressor
@@ -23,10 +24,8 @@ os.environ["MLFLOW_TRACKING_USERNAME"] = os.getenv("MLFLOW_TRACKING_USERNAME")
 os.environ["MLFLOW_TRACKING_PASSWORD"] = os.getenv("MLFLOW_TRACKING_PASSWORD")
 
 
-
 class TrainSaleConfig:
     def __init__(self):
-        # Load paths from config.yaml
         with open("src/config/config.yaml", "r") as f:
             cfg = yaml.safe_load(f)
         sale_cfg = cfg["training"]["sale"]
@@ -35,11 +34,10 @@ class TrainSaleConfig:
         self.model_path = sale_cfg["model_path"]
         self.mlflow_experiment = sale_cfg["mlflow_experiment"]
 
-        # Load hyperparameters from params.yaml
         with open("params.yaml", "r") as f:
             params = yaml.safe_load(f)
 
-        self.params = params["model"]["sale"]  # entire dict
+        self.params = params["model"]["sale"]
 
 
 class TrainSaleModel:
@@ -70,8 +68,6 @@ class TrainSaleModel:
     def run(self):
 
         X_train, X_test, y_train, y_test = self.load_data()
-
-        # ✔ Set experiment name from config.yaml
         mlflow.set_experiment(self.config.mlflow_experiment)
 
         # ---------------- MODEL DEFINITIONS ---------------- #
@@ -99,40 +95,50 @@ class TrainSaleModel:
 
         best_model = None
         best_rmse = float("inf")
+        best_model_name = None
+        best_run_id = None
 
         # ---------------- TRAIN EACH MODEL ---------------- #
         for model_name, model in models.items():
 
-            with mlflow.start_run(run_name=model_name):
+            with mlflow.start_run(run_name=model_name) as run:
 
-                # ✔ Log all parameters for this model
+                # Log params
                 for key, value in self.config.params.items():
                     mlflow.log_param(key, value)
 
                 model = self.train_model(model, X_train, y_train)
                 rmse, r2 = self.evaluate(model, X_test, y_test)
 
-                # ✔ Log metrics
                 mlflow.log_metric("RMSE", rmse)
                 mlflow.log_metric("R2", r2)
 
-                # ✔ Log model file
+                # Log model to artifacts (regular)
                 if model_name == "XGBoost":
-                    mlflow.xgboost.log_model(model, artifact_path=model_name)
+                    mlflow.xgboost.log_model(model, artifact_path="model")
                 else:
-                    mlflow.sklearn.log_model(model, artifact_path=model_name)
+                    mlflow.sklearn.log_model(model, artifact_path="model")
 
                 logger.info(f"{model_name} → RMSE: {rmse}, R2: {r2}")
 
-                # Save best model
+                # Track best model
                 if rmse < best_rmse:
                     best_rmse = rmse
                     best_model = model
                     best_model_name = model_name
+                    best_run_id = run.info.run_id
+
+        # ---------------- REGISTER BEST MODEL IN MLflow ---------------- #
+        logger.info(f"Registering BEST model → {best_model_name}")
+
+        mlflow.register_model(
+            model_uri=f"runs:/{best_run_id}/model",
+            name="xgboost-sale"
+        )
 
         # ---------------- SAVE BEST MODEL LOCALLY ---------------- #
         save_object(best_model, self.config.model_path)
-        logger.info(f"BEST MODEL SAVED: {best_model_name} at {self.config.model_path}")
+        logger.info(f"BEST MODEL SAVED LOCALLY: {best_model_name} → {self.config.model_path}")
 
 
 if __name__ == "__main__":

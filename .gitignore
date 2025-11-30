@@ -2,3 +2,4 @@ logs
 myenv
 __pycache__
 mlruns/
+/artifacts
