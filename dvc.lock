@@ -32,3 +32,195 @@ stages:
       hash: md5
       md5: d0779df0635a30ca78e16471fd62a371
       size: 413472
+  data_ingestion:
+    cmd: python -m src.data.data_ingestion
+    deps:
+    - path: src/config/config.yaml
+      hash: md5
+      md5: e1d5d60098a46a57401acc6e97ada14e
+      size: 1005
+    - path: src/data/data_ingestion.py
+      hash: md5
+      md5: 259a2fc9baacbed847b8c807e3d54038
+      size: 3464
+    - path: src/utils/exceptions.py
+      hash: md5
+      md5: a1604a11cb224fcdd0e3e0b58e8a141c
+      size: 729
+    - path: src/utils/file_ops.py
+      hash: md5
+      md5: e2e670731ea6fd5f05a51ddec1499488
+      size: 2739
+    - path: src/utils/logger.py
+      hash: md5
+      md5: f4ec9abd93dbafe42e98b1a3cfb2174d
+      size: 496
+    outs:
+    - path: artifacts/raw_data/rent.csv
+      hash: md5
+      md5: c5051d9547166b4e2b6e22a8ef1eb77d
+      size: 1013622
+    - path: artifacts/raw_data/sale.csv
+      hash: md5
+      md5: 4df97b2f62f1e5caf5138b3854ac020d
+      size: 2814417
+  data_transformation_sale:
+    cmd: python -m src.data.data_transformation_sale
+    deps:
+    - path: artifacts/raw_data/sale.csv
+      hash: md5
+      md5: 4df97b2f62f1e5caf5138b3854ac020d
+      size: 2814417
+    - path: src/data/data_transformation_sale.py
+      hash: md5
+      md5: 6cb8a7d99853d3e6e496432d35fbf207
+      size: 4318
+    outs:
+    - path: artifacts/transformed_data/sale/X_test.npy
+      hash: md5
+      md5: b195f2c842eb610b97b05e99134091d1
+      size: 99529848
+    - path: artifacts/transformed_data/sale/X_train.npy
+      hash: md5
+      md5: 57a416c402dd1a006ec0e52abd4dc290
+      size: 398108488
+    - path: artifacts/transformed_data/sale/preprocessor.pkl
+      hash: md5
+      md5: 88532ff3c3756327b50ac36e84bebe11
+      size: 24725
+    - path: artifacts/transformed_data/sale/y_test.npy
+      hash: md5
+      md5: 1a8f6fb33fbd084334599a25778447b8
+      size: 75816
+    - path: artifacts/transformed_data/sale/y_train.npy
+      hash: md5
+      md5: 5943f7c5d459015aaabf2518ee2352bb
+      size: 302872
+  data_transformation_rent:
+    cmd: python -m src.data.data_transformation_rent
+    deps:
+    - path: artifacts/raw_data/rent.csv
+      hash: md5
+      md5: c5051d9547166b4e2b6e22a8ef1eb77d
+      size: 1013622
+    - path: src/data/data_transformation_rent.py
+      hash: md5
+      md5: 8f16f133020a8b80cacb02f71f90991b
+      size: 4398
+    outs:
+    - path: artifacts/transformed_data/rent/X_test.npy
+      hash: md5
+      md5: 0ca4f8017ac856de97d291dba8aef321
+      size: 14049376
+    - path: artifacts/transformed_data/rent/X_train.npy
+      hash: md5
+      md5: 7604655aa941f914de8459e9282f2fac
+      size: 56184928
+    - path: artifacts/transformed_data/rent/preprocessor.pkl
+      hash: md5
+      md5: fc9e04285e11ac9a89c18cd5ba0bdf02
+      size: 10679
+    - path: artifacts/transformed_data/rent/y_test.npy
+      hash: md5
+      md5: 62628e7546fb00ae8e77ac0c7f74b358
+      size: 27784
+    - path: artifacts/transformed_data/rent/y_train.npy
+      hash: md5
+      md5: 927287a1800870c08dff4201d65cdaa9
+      size: 110728
+  train_sale_model:
+    cmd: python -m src.models.train_sale_model
+    deps:
+    - path: artifacts/transformed_data/sale/X_test.npy
+      hash: md5
+      md5: b195f2c842eb610b97b05e99134091d1
+      size: 99529848
+    - path: artifacts/transformed_data/sale/X_train.npy
+      hash: md5
+      md5: 57a416c402dd1a006ec0e52abd4dc290
+      size: 398108488
+    - path: artifacts/transformed_data/sale/preprocessor.pkl
+      hash: md5
+      md5: 88532ff3c3756327b50ac36e84bebe11
+      size: 24725
+    - path: artifacts/transformed_data/sale/y_test.npy
+      hash: md5
+      md5: 1a8f6fb33fbd084334599a25778447b8
+      size: 75816
+    - path: artifacts/transformed_data/sale/y_train.npy
+      hash: md5
+      md5: 5943f7c5d459015aaabf2518ee2352bb
+      size: 302872
+    - path: params.yaml
+      hash: md5
+      md5: b78994775a2a63a132ef25e4b555e5d2
+      size: 430
+    - path: src/config/config.yaml
+      hash: md5
+      md5: e1d5d60098a46a57401acc6e97ada14e
+      size: 1005
+    - path: src/models/train_sale_model.py
+      hash: md5
+      md5: b12c9874c905961d5ef70a83c23912df
+      size: 3767
+    params:
+      params.yaml:
+        model.sale.colsample_bytree: 0.8
+        model.sale.learning_rate: 0.1
+        model.sale.max_depth: 8
+        model.sale.n_estimators: 100
+        model.sale.random_state: 42
+        model.sale.subsample: 0.8
+    outs:
+    - path: artifacts/models/xgb_sale.pkl
+      hash: md5
+      md5: 7139daaeaf42f8b279dd7a070e5f9b19
+      size: 528565
+  train_rent_model:
+    cmd: python -m src.models.train_rent_model
+    deps:
+    - path: artifacts/transformed_data/rent/X_test.npy
+      hash: md5
+      md5: 0ca4f8017ac856de97d291dba8aef321
+      size: 14049376
+    - path: artifacts/transformed_data/rent/X_train.npy
+      hash: md5
+      md5: 7604655aa941f914de8459e9282f2fac
+      size: 56184928
+    - path: artifacts/transformed_data/rent/preprocessor.pkl
+      hash: md5
+      md5: fc9e04285e11ac9a89c18cd5ba0bdf02
+      size: 10679
+    - path: artifacts/transformed_data/rent/y_test.npy
+      hash: md5
+      md5: 62628e7546fb00ae8e77ac0c7f74b358
+      size: 27784
+    - path: artifacts/transformed_data/rent/y_train.npy
+      hash: md5
+      md5: 927287a1800870c08dff4201d65cdaa9
+      size: 110728
+    - path: params.yaml
+      hash: md5
+      md5: b78994775a2a63a132ef25e4b555e5d2
+      size: 430
+    - path: src/config/config.yaml
+      hash: md5
+      md5: e1d5d60098a46a57401acc6e97ada14e
+      size: 1005
+    - path: src/models/train_rent_model.py
+      hash: md5
+      md5: fe1f45ab74ce053ea42403692098c445
+      size: 2845
+    params:
+      params.yaml:
+        model.rent.colsample_bytree: 0.8
+        model.rent.learning_rate: 0.05
+        model.rent.max_depth: 7
+        model.rent.n_estimators: 300
+        model.rent.random_state: 42
+        model.rent.subsample: 0.8
+    outs:
+    - path: artifacts/models/xgb_rent.pkl
+      hash: md5
+      md5: a8eb4f785ad3290c0d3bf5c5e8acd1f5
+      size: 1277120
