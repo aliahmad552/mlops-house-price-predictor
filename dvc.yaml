@@ -1,0 +1,78 @@
+stages:
+  data_ingestion:
+    cmd: python -m src.data.data_ingestion
+    deps:
+      - src/data/data_ingestion.py
+      - src/utils/file_ops.py
+      - src/utils/logger.py
+      - src/utils/exceptions.py
+      - src/config/config.yaml
+    outs:
+      - artifacts/raw_data/sale.csv
+      - artifacts/raw_data/rent.csv
+
+  data_transformation_sale:
+    cmd: python -m src.data.data_transformation_sale
+    deps:
+      - src/data/data_transformation_sale.py
+      - artifacts/raw_data/sale.csv
+    outs:
+      - artifacts/transformed_data/sale/X_train.npy
+      - artifacts/transformed_data/sale/X_test.npy
+      - artifacts/transformed_data/sale/y_train.npy
+      - artifacts/transformed_data/sale/y_test.npy
+      - artifacts/transformed_data/sale/preprocessor.pkl
+
+  data_transformation_rent:
+    cmd: python -m src.data.data_transformation_rent
+    deps:
+      - src/data/data_transformation_rent.py
+      - artifacts/raw_data/rent.csv
+    outs:
+      - artifacts/transformed_data/rent/X_train.npy
+      - artifacts/transformed_data/rent/X_test.npy
+      - artifacts/transformed_data/rent/y_train.npy
+      - artifacts/transformed_data/rent/y_test.npy
+      - artifacts/transformed_data/rent/preprocessor.pkl
+
+  train_sale_model:
+    cmd: python -m src.models.train_sale_model
+    deps:
+      - src/models/train_sale_model.py
+      - artifacts/transformed_data/sale/X_train.npy
+      - artifacts/transformed_data/sale/X_test.npy
+      - artifacts/transformed_data/sale/y_train.npy
+      - artifacts/transformed_data/sale/y_test.npy
+      - artifacts/transformed_data/sale/preprocessor.pkl
+      - src/config/config.yaml
+      - params.yaml
+    outs:
+      - artifacts/models/xgb_sale.pkl
+    params:
+      - model.sale.n_estimators
+      - model.sale.learning_rate
+      - model.sale.max_depth
+      - model.sale.subsample
+      - model.sale.colsample_bytree
+      - model.sale.random_state
+
+  train_rent_model:
+    cmd: python -m src.models.train_rent_model
+    deps:
+      - src/models/train_rent_model.py
+      - artifacts/transformed_data/rent/X_train.npy
+      - artifacts/transformed_data/rent/X_test.npy
+      - artifacts/transformed_data/rent/y_train.npy
+      - artifacts/transformed_data/rent/y_test.npy
+      - artifacts/transformed_data/rent/preprocessor.pkl
+      - src/config/config.yaml
+      - params.yaml
+    outs:
+      - artifacts/models/xgb_rent.pkl
+    params:
+      - model.rent.n_estimators
+      - model.rent.learning_rate
+      - model.rent.max_depth
+      - model.rent.subsample
+      - model.rent.colsample_bytree
+      - model.rent.random_state
