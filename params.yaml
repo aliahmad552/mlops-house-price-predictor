@@ -8,12 +8,7 @@ model:
     colsample_bytree: 0.8
     random_state: 42
 
-    # Random Forest
-    rf_n_estimators: 150
-    rf_max_depth: 10
-
-    # Decision Tree
-    dt_max_depth: 10
+   
     
   rent:
     n_estimators: 300

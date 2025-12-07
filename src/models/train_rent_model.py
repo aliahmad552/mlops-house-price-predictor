@@ -1,24 +1,15 @@
 import os
 import sys
 import yaml
+import numpy as np
 import mlflow
 import mlflow.xgboost
-import mlflow.sklearn
-import numpy as np
 from xgboost import XGBRegressor
 from sklearn.metrics import mean_squared_error, r2_score
 
 from src.utils.logger import logger
 from src.utils.exceptions import CustomException
 from src.utils.file_ops import save_object
-from dotenv import load_dotenv
-
-# ---------------- Load MLflow Credentials -------------------
-load_dotenv()
-
-mlflow.set_tracking_uri(os.getenv("MLFLOW_TRACKING_URI"))
-os.environ["MLFLOW_TRACKING_USERNAME"] = os.getenv("MLFLOW_TRACKING_USERNAME")
-os.environ["MLFLOW_TRACKING_PASSWORD"] = os.getenv("MLFLOW_TRACKING_PASSWORD")
 
 
 class TrainRentConfig:
@@ -29,22 +20,17 @@ class TrainRentConfig:
 
         self.transformed_dir = rent_cfg["transformed_dir"]
         self.model_path = rent_cfg["model_path"]
-        self.mlflow_experiment = rent_cfg["mlflow_experiment"]
+        self.mlflow_experiment_path = rent_cfg["mlflow_experiment"]
 
         with open("params.yaml", "r") as f:
             params = yaml.safe_load(f)
-        rent_params = params["model"]["rent"]
-        self.n_estimators = rent_params["n_estimators"]
-        self.learning_rate = rent_params["learning_rate"]
-        self.max_depth = rent_params["max_depth"]
-        self.subsample = rent_params["subsample"]
-        self.colsample_bytree = rent_params["colsample_bytree"]
-        self.random_state = rent_params["random_state"]
+        self.params = params["model"]["rent"]
 
 
 class TrainRentModel:
     def __init__(self):
         self.config = TrainRentConfig()
+
         os.makedirs(os.path.dirname(self.config.model_path), exist_ok=True)
 
     def load_data(self):
@@ -57,18 +43,6 @@ class TrainRentModel:
         except Exception as e:
             raise CustomException(e, sys)
 
-    def train_model(self, X_train, y_train):
-        model = XGBRegressor(
-            n_estimators=self.config.n_estimators,
-            learning_rate=self.config.learning_rate,
-            max_depth=self.config.max_depth,
-            subsample=self.config.subsample,
-            colsample_bytree=self.config.colsample_bytree,
-            random_state=self.config.random_state,
-        )
-        model.fit(X_train, y_train)
-        return model
-
     def evaluate(self, model, X_test, y_test):
         preds = model.predict(X_test)
         rmse = np.sqrt(mean_squared_error(y_test, preds))
@@ -76,30 +50,54 @@ class TrainRentModel:
         return rmse, r2
 
     def run(self):
+
+        # MLflow setup
+        mlflow.set_tracking_uri(os.getenv("MLFLOW_TRACKING_URI"))
+        mlflow.set_experiment(self.config.mlflow_experiment_path)
+
         X_train, X_test, y_train, y_test = self.load_data()
-        mlflow.set_experiment(self.config.mlflow_experiment)
 
-        with mlflow.start_run() as run:
-            model = self.train_model(X_train, y_train)
-            rmse, r2 = self.evaluate(model, X_test, y_test)
+        with mlflow.start_run():
 
-            # Log metrics
-            mlflow.log_metric("RMSE", rmse)
-            mlflow.log_metric("R2", r2)
-
-            # Log model artifact
-            mlflow.xgboost.log_model(model, artifact_path="model")
-
-            # Register model in MLflow Model Registry
-            logger.info("Registering XGBoost Rent model in MLflow Model Registry")
-            mlflow.register_model(
-                model_uri=f"runs:/{run.info.run_id}/model",
-                name="xgboost-rent"
+            # ---------------- XGBoost Model ---------------- #
+            model = XGBRegressor(
+                n_estimators=self.config.params["n_estimators"],
+                learning_rate=self.config.params["learning_rate"],
+                max_depth=self.config.params["max_depth"],
+                subsample=self.config.params["subsample"],
+                colsample_bytree=self.config.params["colsample_bytree"],
+                random_state=self.config.params["random_state"]
             )
 
-            # Save locally
+            logger.info("Training XGBoost model…")
+            model.fit(X_train, y_train)
+
+            # Evaluate
+            rmse, r2 = self.evaluate(model, X_test, y_test)
+            logger.info(f"XGBoost → RMSE: {rmse}, R2: {r2}")
+
+            # Log metrics
+            mlflow.log_metric("rmse", rmse)
+            mlflow.log_metric("r2", r2)
+
+            # Log model parameters
+            for param_name, value in model.get_params().items():
+                mlflow.log_param(param_name, value)
+
+            # -------- Save best model locally for DVC -------- #
             save_object(model, self.config.model_path)
-            logger.info(f"Best Rent model saved locally at: {self.config.model_path}")
+            logger.info("BEST RENT MODEL SAVED LOCALLY (XGBoost)")
+
+            # -------- Log model to MLflow -------- #
+            mlflow.xgboost.log_model(model, artifact_path=self.config.model_path)
+
+            # -------- Register model in MLflow Model Registry -------- #
+            mlflow.register_model(
+                model_uri=f"runs:/{mlflow.active_run().info.run_id}/{self.config.model_path}",
+                name="RentPriceModel"
+            )
+
+            logger.info("✔ XGBoost RENT MODEL LOGGED & REGISTERED SUCCESSFULLY")
 
 
 if __name__ == "__main__":

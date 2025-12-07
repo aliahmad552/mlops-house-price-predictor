@@ -47,6 +47,10 @@ class DataTransformationRent:
         try:
             numeric_features = X.select_dtypes(include=[np.number]).columns.tolist()
             categorical_features = X.select_dtypes(include=['object']).columns.tolist()
+            numeric_features.remove('MyUnknownColumn')
+            print(categorical_features)
+            print(numeric_features)
+
 
             logger.info(f"Numeric features (Rent): {numeric_features}")
             logger.info(f"Categorical features (Rent): {categorical_features}")

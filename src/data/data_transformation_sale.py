@@ -47,6 +47,7 @@ class DataTransformationSale:
         try:
             numeric_features = X.select_dtypes(include=[np.number]).columns.tolist()
             categorical_features = X.select_dtypes(include=['object']).columns.tolist()
+            numeric_features.remove('MyUnknownColumn')
 
             logger.info(f"Numeric features (Sale): {numeric_features}")
             logger.info(f"Categorical features (Sale): {categorical_features}")
