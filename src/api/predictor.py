@@ -2,6 +2,11 @@ import numpy as np
 import pandas as pd
 import joblib
 import pandas as pd
+import os
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))  # src/api
+
+ARTIFACTS_DIR = os.path.join(BASE_DIR, "../../artifacts")
 
 # Load preprocessors
 sale_preprocessor = joblib.load("artifacts/transformed_data/sale/preprocessor.pkl")
