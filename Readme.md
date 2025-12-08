@@ -203,4 +203,67 @@ MLflow remote:
 ```bash
 mlflow ui          # local UI
 ```
- j  # Or push to DagsHub with credentials from .env
+## 🐳 Docker Support
+📌 Dockerfile Used in the Project
+# Use official Python 3.10.11 image
+```bash
+FROM python:3.10.11-slim
+
+WORKDIR /app
+
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+RUN apt-get update && apt-get install -y \
+    build-essential git curl \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt .
+RUN pip install --upgrade pip
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+EXPOSE 8000
+
+CMD ["uvicorn", "src.api.main:app", "--host", "0.0.0.0", "--port", "8000"]
+```
+## 🐳 Build Docker Image
+```bash
+docker build -t aliahmad322/house-price-predictor:latest .
+```
+## 🐳 Run the Container
+```bash
+docker run -p 8000:8000 aliahmad322/house-price-predictor:latest
+```
+## 📤 Push to Docker Hub
+
+Login:
+
+```bash
+docker login
+```
+
+Tag:
+```bash
+docker tag house-price-mlops:latest aliahmad322/house-price-predictor:latest
+
+```
+Push:
+```bash
+docker push aliahmad322/house-price-predictor:latest
+```
+## ▶️ Usage
+Run the prediction API locally:
+```bash
+uvicorn src.api.main:app --reload
+```
+## Run inside Docker:
+```bash
+docker run -p 8000:8000 aliahmad322/house-price-predictor:latest
+```
+## 👨‍💻 Author
+
+Ali Ahmad
+Data Scientist & MLOps Engineer
+GitHub: aliahmad552
